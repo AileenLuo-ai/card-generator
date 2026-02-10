@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acquaintance Card Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Homemade+Apple&family=Patrick+Hand&family=Indie+Flower&family=Shadows+Into+Light&family=Gloria+Hallelujah&family=Architects+Daughter&family=Satisfy&family=Dancing+Script:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>Acquaintance Cards</h1>
+    <p class="subtitle">Old-fashioned flirting, reimagined. Fill one out. Hand it to someone you'd like to know.</p>
+  </header>
+
+  <main>
+    <!-- ====== THE CARD ====== -->
+    <div class="card-wrapper">
+      <div class="card" id="card">
+
+        <!-- Row 1: Greeting + Time/Place -->
+        <div class="card-row greeting-row">
+          <div class="bubble-group">
+            <button class="bubble" data-group="greeting" data-value="Hi">Hi</button>
+            <button class="bubble" data-group="greeting" data-value="Hey">Hey</button>
+            <button class="bubble" data-group="greeting" data-value="Hello">Hello</button>
+            <button class="bubble" data-group="greeting" data-value="Um">Um</button>
+          </div>
+          <div class="side-fields">
+            <label>Time <input type="text" id="field-time" placeholder="Saturday, 7pm" maxlength="30"></label>
+            <label>Place <input type="text" id="field-place" placeholder="the coffee shop on 5th" maxlength="40"></label>
+          </div>
+        </div>
+
+        <!-- Row 2: Name -->
+        <div class="card-row name-row">
+          <div class="bubble-group">
+            <button class="bubble" data-group="intro" data-value="My name is">My name is</button>
+            <button class="bubble" data-group="intro" data-value="My friend's name is">My friend's name is</button>
+          </div>
+          <input type="text" id="field-name" class="handwritten-input name-input" placeholder="your name" maxlength="30">
+        </div>
+
+        <div class="card-divider"></div>
+
+        <!-- Row 3: Compliment intro -->
+        <div class="card-row compliment-intro">
+          <span class="card-text">I just wanted to say that your</span>
+        </div>
+
+        <!-- Row 4: Quality bubbles -->
+        <div class="card-row quality-row">
+          <div class="bubble-group">
+            <button class="bubble" data-group="quality" data-value="look">look</button>
+            <button class="bubble" data-group="quality" data-value="wit">wit</button>
+            <button class="bubble" data-group="quality" data-value="outfit">outfit</button>
+            <button class="bubble" data-group="quality" data-value="height">height</button>
+            <button class="bubble" data-group="quality" data-value="laugh">laugh</button>
+            <button class="bubble" data-group="quality" data-value="energy">energy</button>
+            <button class="bubble" data-group="quality" data-value="smile">smile</button>
+            <button class="bubble" data-group="quality" data-value="kindness">kindness</button>
+            <button class="bubble" data-group="quality" data-value="friend">friend</button>
+            <button class="bubble" data-group="quality" data-value="presence">presence</button>
+            <input type="text" class="bubble-input" data-group="quality" placeholder="____" maxlength="20">
+          </div>
+        </div>
+
+        <div class="card-divider"></div>
+
+        <!-- Row 5: Adjective -->
+        <div class="card-row adjective-row">
+          <div class="bubble-group">
+            <button class="bubble" data-group="adjective" data-value="is hard to ignore.">is hard to ignore.</button>
+            <button class="bubble" data-group="adjective" data-value="is intriguing.">is intriguing.</button>
+            <button class="bubble" data-group="adjective" data-value="caught my eye.">caught my eye.</button>
+          </div>
+        </div>
+
+        <div class="card-divider"></div>
+
+        <!-- Row 6: CTA -->
+        <div class="card-row cta-row">
+          <span class="card-text">Hope to hear from you</span>
+          <div class="bubble-group inline">
+            <button class="bubble small" data-group="when" data-value="soon.">soon.</button>
+            <button class="bubble small" data-group="when" data-value="one day.">one day.</button>
+          </div>
+        </div>
+
+        <!-- Row 7: Contact -->
+        <div class="card-row contact-row">
+          <div class="bubble-group">
+            <button class="bubble" data-group="contact-type" data-value="Phone">Phone</button>
+            <button class="bubble" data-group="contact-type" data-value="@">@</button>
+            <button class="bubble" data-group="contact-type" data-value="Email">Email</button>
+          </div>
+          <input type="text" id="field-contact" class="handwritten-input contact-input" placeholder="your contact info" maxlength="40">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ====== STYLE SWITCHER ====== -->
+    <div class="style-switcher">
+      <button class="style-btn active" data-style="modern">Modern</button>
+      <button class="style-btn" data-style="vintage">Vintage</button>
+      <button class="style-btn" data-style="borderless">Borderless</button>
+    </div>
+
+    <!-- ====== CUSTOMIZER ====== -->
+    <div class="customizer" id="customizer">
+      <button class="customizer-toggle" id="customizer-toggle">Customize Style</button>
+      <div class="customizer-panel" id="customizer-panel">
+
+        <div class="customizer-group">
+          <label class="customizer-label">Card Font</label>
+          <select id="opt-font-body">
+            <option value="'DM Sans', sans-serif">DM Sans (default)</option>
+            <option value="'Architects Daughter', cursive">Architects Daughter</option>
+            <option value="'Patrick Hand', cursive">Patrick Hand</option>
+            <option value="'Indie Flower', cursive">Indie Flower</option>
+            <option value="'Gloria Hallelujah', cursive">Gloria Hallelujah</option>
+            <option value="Georgia, serif">Georgia</option>
+            <option value="system-ui, sans-serif">System UI</option>
+          </select>
+        </div>
+
+        <div class="customizer-group">
+          <label class="customizer-label">Handwriting Font</label>
+          <select id="opt-font-hand">
+            <option value="'Caveat', cursive">Caveat (default)</option>
+            <option value="'Homemade Apple', cursive">Homemade Apple</option>
+            <option value="'Shadows Into Light', cursive">Shadows Into Light</option>
+            <option value="'Dancing Script', cursive">Dancing Script</option>
+            <option value="'Satisfy', cursive">Satisfy</option>
+            <option value="'Patrick Hand', cursive">Patrick Hand</option>
+          </select>
+        </div>
+
+        <div class="customizer-group">
+          <label class="customizer-label">Ink Color</label>
+          <div class="ink-swatches" id="ink-swatches">
+            <button class="ink-swatch active" data-color="#2c2420" style="background:#2c2420" title="Dark Brown"></button>
+            <button class="ink-swatch" data-color="#1a1a2e" style="background:#1a1a2e" title="Midnight"></button>
+            <button class="ink-swatch" data-color="#0d3b66" style="background:#0d3b66" title="Navy"></button>
+            <button class="ink-swatch" data-color="#6b2737" style="background:#6b2737" title="Burgundy"></button>
+            <button class="ink-swatch" data-color="#2d6a4f" style="background:#2d6a4f" title="Forest"></button>
+            <button class="ink-swatch" data-color="#7b2d8b" style="background:#7b2d8b" title="Plum"></button>
+            <button class="ink-swatch" data-color="#c96b6b" style="background:#c96b6b" title="Rose"></button>
+            <input type="color" id="ink-custom" value="#2c2420" title="Custom color">
+          </div>
+        </div>
+
+        <div class="customizer-group">
+          <label class="customizer-label">Card Spacing</label>
+          <input type="range" id="opt-spacing" min="0.5" max="1.5" step="0.1" value="1">
+          <span class="range-label" id="spacing-label">Normal</span>
+        </div>
+
+        <div class="customizer-group">
+          <label class="customizer-label">Font Size</label>
+          <input type="range" id="opt-font-size" min="0.8" max="1.3" step="0.05" value="1">
+          <span class="range-label" id="font-size-label">Normal</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ====== ACTIONS ====== -->
+    <div class="actions">
+      <button class="btn btn-secondary" id="btn-reset">Start Over</button>
+      <button class="btn btn-primary" id="btn-print">Print Cards</button>
+    </div>
+
+    <!-- ====== PRINT PREVIEW (4-up) ====== -->
+    <div class="print-sheet" id="print-sheet"></div>
+  </main>
+
+  <footer>
+    <p>Made with <span class="heart">&hearts;</span> for real-life connections</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

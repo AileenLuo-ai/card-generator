@@ -1,0 +1,801 @@
+/* ===== RESET & BASE ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --cream: #faf7f2;
+  --warm-white: #fffdf9;
+  --ink: #2c2420;
+  --ink-light: #6b5e56;
+  --rose: #e8a0a0;
+  --rose-deep: #c96b6b;
+  --blush: #f5ddd5;
+  --highlight: #c96b6b;
+  --card-border: #d4c8be;
+  --card-shadow: rgba(44, 36, 32, 0.08);
+  --ink-color: #2c2420;
+  --radius: 4px;
+  --font-body: "DM Sans", sans-serif;
+  --font-hand: "Caveat", cursive;
+  --font-display: "Playfair Display", serif;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--cream);
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ===== HEADER ===== */
+header {
+  text-align: center;
+  padding: 3rem 1.5rem 1.5rem;
+  max-width: 540px;
+}
+
+header h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 2.4rem;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  color: var(--ink-light);
+  line-height: 1.5;
+}
+
+/* ===== MAIN ===== */
+main {
+  width: 100%;
+  max-width: 640px;
+  padding: 0 1.25rem 3rem;
+}
+
+/* ===== STYLE SWITCHER ===== */
+.style-switcher {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.style-btn {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 500;
+  padding: 0.5rem 1.5rem;
+  border: 1px solid var(--card-border);
+  background: transparent;
+  color: var(--ink-light);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.style-btn:first-child {
+  border-radius: 999px 0 0 999px;
+}
+
+.style-btn:not(:first-child) {
+  border-left: none;
+}
+
+.style-btn:last-child {
+  border-radius: 0 999px 999px 0;
+}
+
+.style-btn.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--warm-white);
+}
+
+/* ===== THE CARD (shared) ===== */
+.card-wrapper {
+  perspective: 900px;
+}
+
+.card {
+  background: var(--warm-white);
+  border: 2px solid var(--card-border);
+  border-radius: 6px;
+  padding: 1.5rem 1.75rem;
+  box-shadow:
+    0 1px 3px var(--card-shadow),
+    0 8px 24px var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  position: relative;
+  color: var(--ink-color);
+}
+
+/* subtle paper texture via repeating gradient */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 1.6rem,
+    rgba(200, 190, 180, 0.1) 1.6rem,
+    rgba(200, 190, 180, 0.1) calc(1.6rem + 1px)
+  );
+  pointer-events: none;
+}
+
+.card-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.card-divider {
+  border-top: 1px solid var(--card-border);
+  margin: 0.15rem 0;
+}
+
+/* ===== BUBBLE BUTTONS ===== */
+.bubble-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.bubble-group.inline {
+  display: inline-flex;
+}
+
+.bubble {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  padding: 0.3rem 0.75rem;
+  border: 1.5px solid var(--card-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-color);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.bubble:hover {
+  border-color: var(--rose);
+  background: rgba(232, 160, 160, 0.08);
+}
+
+.bubble.selected {
+  border-color: var(--highlight);
+  background: var(--blush);
+  color: var(--highlight);
+  font-weight: 500;
+  box-shadow: 0 0 0 1px var(--highlight);
+}
+
+.bubble.small {
+  font-size: 0.82rem;
+  padding: 0.25rem 0.6rem;
+}
+
+/* ===== TEXT INPUTS ===== */
+.handwritten-input,
+.bubble-input,
+.side-fields input {
+  font-family: var(--font-hand);
+  font-size: 1.4rem;
+  border: none;
+  border-bottom: 1.5px solid var(--card-border);
+  background: transparent;
+  color: var(--ink-color);
+  padding: 0.15rem 0.25rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.handwritten-input:focus,
+.bubble-input:focus,
+.side-fields input:focus {
+  border-bottom-color: var(--highlight);
+}
+
+.name-input {
+  flex: 1;
+  min-width: 120px;
+  max-width: 200px;
+}
+
+.contact-input {
+  flex: 1;
+  min-width: 160px;
+}
+
+.bubble-input {
+  width: 90px;
+  font-size: 0.88rem;
+  font-family: var(--font-body);
+  border-radius: 999px;
+  border: 1.5px dashed var(--card-border);
+  text-align: center;
+  padding: 0.3rem 0.5rem;
+}
+
+.bubble-input:focus {
+  border-style: solid;
+  border-color: var(--highlight);
+}
+
+.bubble-input.has-value {
+  border-style: solid;
+  border-color: var(--highlight);
+  background: var(--blush);
+  color: var(--highlight);
+  font-weight: 500;
+}
+
+/* ===== SIDE FIELDS (time / place) ===== */
+.greeting-row {
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.name-row {
+  justify-content: flex-start;
+}
+
+.side-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.side-fields label {
+  font-size: 0.78rem;
+  color: var(--ink-light);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.side-fields input {
+  width: 170px;
+  font-size: 1.1rem;
+}
+
+/* ===== CARD TEXT ===== */
+.card-text {
+  font-size: 0.92rem;
+  color: var(--ink-color);
+}
+
+/* ===== CTA ROW ===== */
+.cta-row {
+  gap: 0.6rem;
+}
+
+/* ================================================
+   VINTAGE STYLE — classic calling card aesthetic
+   ================================================ */
+body.vintage .card {
+  border: 2.5px solid var(--ink-color);
+  border-radius: 2px;
+  box-shadow: none;
+  padding: 1.25rem 1.5rem;
+  gap: 0.55rem;
+}
+
+body.vintage .card::before {
+  display: none;
+}
+
+body.vintage .card-divider {
+  border-top-color: var(--ink-color);
+  opacity: 0.3;
+}
+
+body.vintage .bubble {
+  border-radius: 2px;
+  border-color: var(--ink-color);
+  font-size: 0.82rem;
+  padding: 0.2rem 0.55rem;
+  opacity: 0.85;
+}
+
+body.vintage .bubble:hover {
+  opacity: 1;
+  border-color: var(--ink-color);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+body.vintage .bubble.selected {
+  background: var(--ink-color);
+  color: var(--warm-white);
+  border-color: var(--ink-color);
+  box-shadow: none;
+  opacity: 1;
+}
+
+body.vintage .handwritten-input,
+body.vintage .side-fields input {
+  border-bottom-color: var(--ink-color);
+  opacity: 1;
+}
+
+body.vintage .handwritten-input:focus,
+body.vintage .side-fields input:focus {
+  border-bottom-color: var(--ink-color);
+  opacity: 1;
+}
+
+body.vintage .side-fields label {
+  color: var(--ink-color);
+  opacity: 1;
+}
+
+body.vintage .bubble-input {
+  border-radius: 2px;
+  border-color: var(--ink-color);
+  opacity: 1;
+}
+
+body.vintage .bubble-input:focus {
+  opacity: 1;
+  border-color: var(--ink-color);
+}
+
+body.vintage .bubble-input.has-value {
+  background: var(--ink-color);
+  color: var(--warm-white);
+  border-color: var(--ink-color);
+  opacity: 1;
+}
+
+/* ================================================
+   BORDERLESS STYLE — clean, no borders anywhere
+   ================================================ */
+body.borderless .card {
+  border: 0.2px solid var(--card-border);
+  box-shadow: none;
+  border-radius: 0;
+}
+
+body.borderless .card::before {
+  display: none;
+}
+
+body.borderless .card-divider {
+  border-top-color: transparent;
+}
+
+body.borderless .bubble {
+  border-color: transparent;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+body.borderless .bubble:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: transparent;
+}
+
+body.borderless .bubble.selected {
+  background: var(--ink-color);
+  color: var(--warm-white);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+body.borderless .handwritten-input,
+body.borderless .side-fields input {
+  border-bottom-color: rgba(0, 0, 0, 0.15);
+}
+
+body.borderless .handwritten-input:focus,
+body.borderless .side-fields input:focus {
+  border-bottom-color: var(--ink-color);
+}
+
+body.borderless .bubble-input {
+  border-color: transparent;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+body.borderless .bubble-input:focus {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: transparent;
+}
+
+body.borderless .bubble-input.has-value {
+  background: var(--ink-color);
+  color: var(--warm-white);
+  border-color: transparent;
+}
+
+/* ===== ACTIONS ===== */
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.65rem 1.75rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-primary {
+  background: var(--ink);
+  color: var(--warm-white);
+}
+
+.btn-primary:hover {
+  background: #443a34;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(44, 36, 32, 0.2);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--ink-light);
+  border: 1.5px solid var(--card-border);
+}
+
+.btn-secondary:hover {
+  border-color: var(--ink-light);
+  color: var(--ink);
+}
+
+/* ===== CUSTOMIZER ===== */
+.customizer {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.customizer-toggle {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink-light);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem 0;
+  border-bottom: 1px dashed var(--card-border);
+  transition: color 0.15s;
+}
+
+.customizer-toggle:hover {
+  color: var(--ink);
+}
+
+.customizer-toggle.open {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
+.customizer-panel {
+  display: none;
+  margin-top: 1rem;
+  background: var(--warm-white);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  width: 100%;
+  max-width: 480px;
+  gap: 1rem;
+  flex-direction: column;
+}
+
+.customizer-panel.open {
+  display: flex;
+}
+
+.customizer-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.customizer-label {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--ink);
+  min-width: 120px;
+  flex-shrink: 0;
+}
+
+.customizer-group select {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  background: white;
+  color: var(--ink);
+  flex: 1;
+  cursor: pointer;
+  outline: none;
+}
+
+.customizer-group select:focus {
+  border-color: var(--highlight);
+}
+
+.customizer-group input[type="range"] {
+  flex: 1;
+  accent-color: var(--highlight);
+}
+
+.range-label {
+  font-size: 0.78rem;
+  color: var(--ink-light);
+  min-width: 55px;
+  text-align: right;
+}
+
+/* ===== INK SWATCHES ===== */
+.ink-swatches {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.ink-swatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+  outline: none;
+}
+
+.ink-swatch:hover {
+  transform: scale(1.15);
+}
+
+.ink-swatch.active {
+  border-color: var(--card-border);
+  box-shadow:
+    0 0 0 2px white,
+    0 0 0 3.5px var(--ink-light);
+}
+
+#ink-custom {
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--card-border);
+  border-radius: 50%;
+  padding: 0;
+  cursor: pointer;
+  background: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+#ink-custom::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+#ink-custom::-webkit-color-swatch {
+  border: none;
+  border-radius: 50%;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  padding: 2rem 1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--ink-light);
+}
+
+.heart {
+  color: var(--rose-deep);
+}
+
+/* ===== PRINT SHEET (hidden on screen) ===== */
+.print-sheet {
+  display: none;
+}
+
+/* ===== PRINT STYLES — 6 landscape cards per page ===== */
+@media print {
+  @page {
+    size: letter;
+    margin: 0.35in;
+  }
+
+  body {
+    background: white;
+  }
+
+  header,
+  .actions,
+  footer,
+  .subtitle,
+  .customizer,
+  .style-switcher {
+    display: none !important;
+  }
+
+  main {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .card-wrapper {
+    display: none;
+  }
+
+  .print-sheet {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(3, 1fr);
+    gap: 0.2in;
+    width: 100%;
+    height: calc(100vh - 0.7in);
+  }
+
+  .print-card {
+    border: 0.2px solid color-mix(currentColor 20%, transparent);
+    border-radius: 3px;
+    padding: 0.3rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.12rem;
+    overflow: hidden;
+    break-inside: avoid;
+  }
+
+  /* Vintage print style */
+  .print-card.pc-vintage {
+    border-width: 0.75px;
+    opacity: 0.7;
+    border-radius: 0.6px;
+  }
+
+  /* Borderless print style */
+  .print-card.pc-borderless {
+    border: none;
+  }
+
+  .print-card.pc-borderless .pc-bubble {
+    border-color: transparent;
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .print-card.pc-borderless .pc-divider {
+    border-top-color: transparent;
+  }
+
+  .print-card .pc-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.15rem;
+  }
+
+  .print-card .pc-divider {
+    border-top: 0.5px solid currentColor;
+    opacity: 0.2;
+    margin: 0.08rem 0;
+  }
+
+  /* Modern bubbles */
+  .print-card .pc-bubble {
+    display: inline-block;
+    padding: 0.06rem 0.3rem;
+    border: 0.5px solid currentColor;
+    border-radius: 999px;
+    font-size: 0.55rem;
+    white-space: nowrap;
+    opacity: 0.7;
+  }
+
+  /* Vintage bubbles — square */
+  .print-card.pc-vintage .pc-bubble {
+    border-radius: 1px;
+    font-size: 0.52rem;
+    padding: 0.04rem 0.25rem;
+  }
+
+  .print-card .pc-handwritten {
+    font-family: var(--font-hand);
+    font-size: 0.75rem;
+    border-bottom: 0.5px solid currentColor;
+    min-width: 60px;
+    display: inline-block;
+  }
+
+  .print-card .pc-text {
+    font-size: 0.55rem;
+  }
+
+  .print-card .pc-side {
+    margin-left: auto;
+    font-size: 0.48rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+  }
+
+  .print-card .pc-side-line {
+    display: inline-block;
+    border-bottom: 1px solid currentColor;
+    min-width: 60px;
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+  header h1 {
+    font-size: 1.8rem;
+  }
+
+  .card {
+    padding: 1.25rem 1rem;
+  }
+
+  .side-fields input {
+    width: 120px;
+  }
+
+  .name-input {
+    max-width: 140px;
+  }
+
+  .customizer-group {
+    flex-wrap: wrap;
+  }
+
+  .customizer-label {
+    min-width: 100%;
+    margin-bottom: -0.25rem;
+  }
+
+  .style-switcher {
+    margin-top: 1rem;
+  }
+}
