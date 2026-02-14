@@ -1,6 +1,69 @@
 // ===== State =====
-let currentStyle = "modern"; // 'modern' | 'vintage'
-let currentInk = "#2c2420";
+let currentStyle = "borderless";
+let currentInk = "#d85c52";
+let uploadedFontCount = 0;
+
+const card = document.getElementById("card");
+const fontBodySelect = document.getElementById("opt-font-body");
+const fontUploadInput = document.getElementById("opt-font-upload");
+const imageUploadInput = document.getElementById("opt-image-upload");
+const imageClearBtn = document.getElementById("opt-image-clear");
+const imageSizeSlider = document.getElementById("opt-image-size");
+const imageSizeLabel = document.getElementById("image-size-label");
+const imageLayer = document.getElementById("card-image-layer");
+const cardImage = document.getElementById("card-image");
+
+const imageState = {
+  src: "",
+  x: 50,
+  y: 50,
+  size: 28,
+  aspectRatio: 1,
+};
+
+const dragState = {
+  active: false,
+  offsetX: 0,
+  offsetY: 0,
+};
+
+// ===== Shared helpers =====
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function addFontOption(select, value, label) {
+  const exists = Array.from(select.options).some((option) => option.value === value);
+  if (exists) return;
+
+  const option = document.createElement("option");
+  option.value = value;
+  option.textContent = label;
+  select.appendChild(option);
+}
+
+function readableFontName(filename) {
+  return filename
+    .replace(/\.[^.]+$/, "")
+    .replace(/[\-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function applyBodyFont(fontFamily) {
+  card.style.fontFamily = fontFamily;
+  document
+    .querySelectorAll(
+      ".bubble, .bubble-input, .card-text, .handwritten-input, .side-fields input"
+    )
+    .forEach((el) => {
+      el.style.fontFamily = fontFamily;
+    });
+}
+
+function updateImageSizeLabel() {
+  imageSizeLabel.textContent = `${Math.round(imageState.size)}%`;
+}
 
 // ===== Bubble Selection =====
 document.querySelectorAll(".bubble").forEach((bubble) => {
@@ -14,7 +77,7 @@ document.querySelectorAll(".bubble").forEach((bubble) => {
     const groupParent = bubble.closest(".bubble-group");
     if (groupParent) {
       const customInput = groupParent.querySelector(".bubble-input");
-      if (customInput && bubble !== customInput) {
+      if (customInput) {
         customInput.value = "";
         customInput.classList.remove("has-value");
       }
@@ -28,11 +91,9 @@ document.querySelectorAll(".bubble-input").forEach((input) => {
     const group = input.dataset.group;
     if (input.value.trim()) {
       input.classList.add("has-value");
-      document
-        .querySelectorAll(`.bubble[data-group="${group}"]`)
-        .forEach((b) => {
-          b.classList.remove("selected");
-        });
+      document.querySelectorAll(`.bubble[data-group="${group}"]`).forEach((b) => {
+        b.classList.remove("selected");
+      });
     } else {
       input.classList.remove("has-value");
     }
@@ -41,21 +102,25 @@ document.querySelectorAll(".bubble-input").forEach((input) => {
 
 // ===== Reset =====
 document.getElementById("btn-reset").addEventListener("click", () => {
-  document
-    .querySelectorAll(".bubble.selected")
-    .forEach((b) => b.classList.remove("selected"));
+  document.querySelectorAll(".bubble.selected").forEach((b) => b.classList.remove("selected"));
   document.querySelectorAll('input[type="text"]').forEach((i) => {
     i.value = "";
     i.classList.remove("has-value");
   });
+  clearCardImage();
+  imageSizeSlider.value = "0.28";
+  imageState.size = 28;
+  updateImageSizeLabel();
+  spacingSlider.value = spacingSlider.defaultValue;
+  fontSizeSlider.value = fontSizeSlider.defaultValue;
+  applySpacingScale(parseFloat(spacingSlider.value));
+  applyFontScale(parseFloat(fontSizeSlider.value));
 });
 
 // ===== Style Switcher =====
 document.querySelectorAll(".style-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
-    document
-      .querySelectorAll(".style-btn")
-      .forEach((b) => b.classList.remove("active"));
+    document.querySelectorAll(".style-btn").forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
     currentStyle = btn.dataset.style;
 
@@ -68,36 +133,42 @@ document.querySelectorAll(".style-btn").forEach((btn) => {
   });
 });
 
-// ===== Customizer Toggle =====
-const toggleBtn = document.getElementById("customizer-toggle");
-const panel = document.getElementById("customizer-panel");
-
-toggleBtn.addEventListener("click", () => {
-  const isOpen = panel.classList.toggle("open");
-  toggleBtn.classList.toggle("open", isOpen);
-  toggleBtn.textContent = isOpen ? "Hide Style Options" : "Customize Style";
+// ===== Font pickers =====
+fontBodySelect.addEventListener("change", (event) => {
+  applyBodyFont(event.target.value);
 });
 
-// ===== Customizer: Font pickers =====
-const card = document.getElementById("card");
+fontUploadInput.addEventListener("change", async (event) => {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
 
-document.getElementById("opt-font-body").addEventListener("change", (e) => {
-  card.style.fontFamily = e.target.value;
-  document.querySelectorAll(".bubble").forEach((b) => {
-    b.style.fontFamily = e.target.value;
-  });
-  document.querySelectorAll(".card-text").forEach((t) => {
-    t.style.fontFamily = e.target.value;
-  });
-});
+  if (typeof FontFace === "undefined") {
+    window.alert("This browser does not support loading local fonts.");
+    return;
+  }
 
-document.getElementById("opt-font-hand").addEventListener("change", (e) => {
-  document
-    .querySelectorAll(".handwritten-input, .side-fields input")
-    .forEach((el) => {
-      el.style.fontFamily = e.target.value;
-    });
-  card.dataset.fontHand = e.target.value;
+  uploadedFontCount += 1;
+  const displayName = readableFontName(file.name) || "Custom Font";
+  const family = `${displayName} ${uploadedFontCount}`;
+  const value = `'${family}'`;
+  const sourceUrl = URL.createObjectURL(file);
+
+  try {
+    const font = new FontFace(family, `url(${sourceUrl})`);
+    await font.load();
+    document.fonts.add(font);
+
+    addFontOption(fontBodySelect, value, `${displayName} (uploaded)`);
+
+    fontBodySelect.value = value;
+    applyBodyFont(value);
+  } catch (error) {
+    console.error(error);
+    window.alert("Could not load that font file. Try a .otf, .ttf, .woff, or .woff2 file.");
+  } finally {
+    URL.revokeObjectURL(sourceUrl);
+    fontUploadInput.value = "";
+  }
 });
 
 // ===== Ink Color =====
@@ -105,12 +176,12 @@ function setInkColor(color) {
   currentInk = color;
   document.documentElement.style.setProperty("--ink-color", color);
 
-  // Update swatch active states
-  document
-    .querySelectorAll(".ink-swatch")
-    .forEach((s) => s.classList.remove("active"));
-  const match = document.querySelector(`.ink-swatch[data-color="${color}"]`);
-  if (match) match.classList.add("active");
+  document.querySelectorAll(".ink-swatch").forEach((swatch) => {
+    swatch.classList.remove("active");
+  });
+
+  const matchingSwatch = document.querySelector(`.ink-swatch[data-color="${color}"]`);
+  if (matchingSwatch) matchingSwatch.classList.add("active");
 }
 
 document.querySelectorAll(".ink-swatch").forEach((swatch) => {
@@ -120,58 +191,178 @@ document.querySelectorAll(".ink-swatch").forEach((swatch) => {
   });
 });
 
-document.getElementById("ink-custom").addEventListener("input", (e) => {
-  document
-    .querySelectorAll(".ink-swatch")
-    .forEach((s) => s.classList.remove("active"));
-  setInkColor(e.target.value);
+document.getElementById("ink-custom").addEventListener("input", (event) => {
+  document.querySelectorAll(".ink-swatch").forEach((swatch) => {
+    swatch.classList.remove("active");
+  });
+  setInkColor(event.target.value);
 });
+
+// ===== Card image =====
+function renderCardImage() {
+  if (!imageState.src) {
+    imageLayer.classList.remove("has-image");
+    cardImage.removeAttribute("src");
+    return;
+  }
+
+  const rect = card.getBoundingClientRect();
+  if (!rect.width || !rect.height) return;
+
+  let widthPx = (imageState.size / 100) * rect.width;
+  let heightPx = widthPx / imageState.aspectRatio;
+
+  const maxHeight = rect.height * 0.9;
+  if (heightPx > maxHeight) {
+    heightPx = maxHeight;
+    widthPx = heightPx * imageState.aspectRatio;
+    imageState.size = (widthPx / rect.width) * 100;
+  }
+
+  const halfWidthPct = (widthPx / 2 / rect.width) * 100;
+  const halfHeightPct = (heightPx / 2 / rect.height) * 100;
+
+  imageState.x = clamp(imageState.x, halfWidthPct, 100 - halfWidthPct);
+  imageState.y = clamp(imageState.y, halfHeightPct, 100 - halfHeightPct);
+
+  imageLayer.classList.add("has-image");
+  cardImage.style.width = `${imageState.size}%`;
+  cardImage.style.left = `${imageState.x}%`;
+  cardImage.style.top = `${imageState.y}%`;
+  updateImageSizeLabel();
+}
+
+function clearCardImage() {
+  imageState.src = "";
+  imageState.x = 50;
+  imageState.y = 50;
+  imageState.aspectRatio = 1;
+  imageLayer.classList.remove("has-image");
+  cardImage.classList.remove("dragging");
+  cardImage.removeAttribute("src");
+  imageUploadInput.value = "";
+}
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
+imageUploadInput.addEventListener("change", async (event) => {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  try {
+    const dataUrl = await readFileAsDataUrl(file);
+    imageState.src = dataUrl;
+    imageState.x = 50;
+    imageState.y = 50;
+    cardImage.src = dataUrl;
+  } catch (error) {
+    console.error(error);
+    window.alert("Could not load that image file.");
+  } finally {
+    imageUploadInput.value = "";
+  }
+});
+
+imageClearBtn.addEventListener("click", clearCardImage);
+
+imageSizeSlider.addEventListener("input", (event) => {
+  imageState.size = clamp(parseFloat(event.target.value) * 100, 12, 80);
+  renderCardImage();
+});
+
+cardImage.addEventListener("load", () => {
+  if (!cardImage.naturalWidth || !cardImage.naturalHeight) return;
+  imageState.aspectRatio = cardImage.naturalWidth / cardImage.naturalHeight;
+  renderCardImage();
+});
+
+cardImage.addEventListener("pointerdown", (event) => {
+  if (!imageState.src) return;
+
+  event.preventDefault();
+
+  const rect = card.getBoundingClientRect();
+  const centerX = rect.left + (imageState.x / 100) * rect.width;
+  const centerY = rect.top + (imageState.y / 100) * rect.height;
+
+  dragState.active = true;
+  dragState.offsetX = event.clientX - centerX;
+  dragState.offsetY = event.clientY - centerY;
+
+  cardImage.classList.add("dragging");
+  cardImage.setPointerCapture(event.pointerId);
+});
+
+cardImage.addEventListener("pointermove", (event) => {
+  if (!dragState.active) return;
+
+  const rect = card.getBoundingClientRect();
+  const centerX = event.clientX - dragState.offsetX;
+  const centerY = event.clientY - dragState.offsetY;
+
+  imageState.x = ((centerX - rect.left) / rect.width) * 100;
+  imageState.y = ((centerY - rect.top) / rect.height) * 100;
+  renderCardImage();
+});
+
+function stopImageDrag(event) {
+  if (!dragState.active) return;
+
+  dragState.active = false;
+  cardImage.classList.remove("dragging");
+
+  if (event && cardImage.hasPointerCapture(event.pointerId)) {
+    cardImage.releasePointerCapture(event.pointerId);
+  }
+}
+
+cardImage.addEventListener("pointerup", stopImageDrag);
+cardImage.addEventListener("pointercancel", stopImageDrag);
+cardImage.addEventListener("lostpointercapture", stopImageDrag);
+
+window.addEventListener("resize", renderCardImage);
 
 // ===== Customizer: Spacing =====
 const spacingSlider = document.getElementById("opt-spacing");
 const spacingLabel = document.getElementById("spacing-label");
-const spacingLabels = {
-  0.5: "Tight",
-  0.6: "Tight",
-  0.7: "Compact",
-  0.8: "Compact",
-  0.9: "Snug",
-  1: "Normal",
-  1.1: "Relaxed",
-  1.2: "Relaxed",
-  1.3: "Roomy",
-  1.4: "Roomy",
-  1.5: "Spacious",
-};
 
-spacingSlider.addEventListener("input", (e) => {
-  const v = parseFloat(e.target.value);
-  card.style.gap = 0.85 * v + "rem";
-  card.style.padding = 1.5 * v + "rem " + 1.75 * v + "rem";
-  spacingLabel.textContent = spacingLabels[e.target.value] || "Normal";
+function applySpacingScale(value) {
+  const min = parseFloat(spacingSlider.min);
+  const max = parseFloat(spacingSlider.max);
+  const scale = clamp(value, min, max);
+
+  card.style.gap = `${(0.85 * scale).toFixed(3)}rem`;
+  card.style.padding = `${(1.5 * scale).toFixed(3)}rem ${(1.75 * scale).toFixed(3)}rem`;
+  spacingLabel.textContent = `${Math.round(scale * 100)}%`;
+}
+
+spacingSlider.addEventListener("input", (event) => {
+  applySpacingScale(parseFloat(event.target.value));
 });
 
 // ===== Customizer: Font size =====
 const fontSizeSlider = document.getElementById("opt-font-size");
 const fontSizeLabel = document.getElementById("font-size-label");
-const fontSizeLabels = {
-  0.8: "Small",
-  0.85: "Small",
-  0.9: "Compact",
-  0.95: "Compact",
-  1: "Normal",
-  1.05: "Medium",
-  1.1: "Medium",
-  1.15: "Large",
-  1.2: "Large",
-  1.25: "XL",
-  1.3: "XL",
-};
 
-fontSizeSlider.addEventListener("input", (e) => {
-  const v = parseFloat(e.target.value);
-  card.style.fontSize = v + "rem";
-  fontSizeLabel.textContent = fontSizeLabels[e.target.value] || "Normal";
+function applyFontScale(value) {
+  const min = parseFloat(fontSizeSlider.min);
+  const max = parseFloat(fontSizeSlider.max);
+  const scale = clamp(value, min, max);
+
+  card.style.fontSize = "";
+  card.style.setProperty("--card-font-scale", scale.toFixed(3));
+  fontSizeLabel.textContent = `${Math.round(scale * 100)}%`;
+}
+
+fontSizeSlider.addEventListener("input", (event) => {
+  applyFontScale(parseFloat(event.target.value));
 });
 
 // ===== Print =====
@@ -180,85 +371,48 @@ document.getElementById("btn-print").addEventListener("click", () => {
   window.print();
 });
 
-// ===== Build print-ready layout — 6 blank cards per page =====
+function cloneCardForPrint() {
+  const clone = card.cloneNode(true);
+  clone.classList.add("print-card");
+
+  clone.querySelectorAll(".bubble.selected").forEach((bubble) => {
+    bubble.classList.remove("selected");
+  });
+  clone.querySelectorAll(".bubble-input.has-value").forEach((input) => {
+    input.classList.remove("has-value");
+  });
+
+  const sourceTextInputs = card.querySelectorAll('input[type="text"]');
+  const cloneTextInputs = clone.querySelectorAll('input[type="text"]');
+  sourceTextInputs.forEach((sourceInput, index) => {
+    const cloneInput = cloneTextInputs[index];
+    if (!cloneInput) return;
+    cloneInput.value = sourceInput.value;
+    const shouldKeepActiveInputStyle =
+      !cloneInput.classList.contains("bubble-input") &&
+      sourceInput.classList.contains("has-value");
+    cloneInput.classList.toggle("has-value", shouldKeepActiveInputStyle);
+  });
+
+  return clone;
+}
+
+// ===== Build print-ready layout — 4 cards per page =====
 function buildPrintSheet() {
   const sheet = document.getElementById("print-sheet");
   sheet.innerHTML = "";
 
-  const fontBody = document.getElementById("opt-font-body").value;
-  const fontHand = card.dataset.fontHand || "'Caveat', cursive";
-  const isVintage = currentStyle === "vintage";
-
-  for (let i = 0; i < 6; i++) {
-    sheet.appendChild(createPrintCard(fontBody, fontHand, isVintage));
+  for (let i = 0; i < 4; i += 1) {
+    const slot = document.createElement("div");
+    slot.className = "print-card-slot";
+    slot.appendChild(cloneCardForPrint());
+    sheet.appendChild(slot);
   }
 }
 
-function createPrintCard(fontBody, fontHand, isVintage) {
-  const el = document.createElement("div");
-  let cls = "print-card";
-  if (isVintage) cls += " pc-vintage";
-  else if (currentStyle === "borderless") cls += " pc-borderless";
-  el.className = cls;
-  el.style.fontFamily = fontBody;
-  el.style.color = currentInk;
-
-  const greetings = ["Hi", "Hey", "Hello", "Um"];
-  const intros = ["My name is", "My friend's name is"];
-  const qualities = [
-    "look",
-    "wit",
-    "outfit",
-    "height",
-    "laugh",
-    "energy",
-    "smile",
-    "kindness",
-    "friend",
-    "presence",
-  ];
-  const adjectives = ["is hard to ignore.", "is intriguing.", "caught my eye."];
-  const whens = ["soon.", "one day."];
-  const contacts = ["Phone", "@", "Email"];
-
-  const bub = (text) => `<span class="pc-bubble">${text}</span>`;
-  const blank = (width) =>
-    `<span class="pc-handwritten" style="font-family:${fontHand};min-width:${width}">&nbsp;</span>`;
-  const sideLine = (label, width) =>
-    `<div class="pc-side">${label} <span class="pc-side-line" style="min-width:${width}">&nbsp;</span></div>`;
-
-  el.innerHTML = `
-    <div class="pc-row">
-      ${greetings.map((g) => bub(g)).join(" ")}
-      ${sideLine("Time", "55px")}
-    </div>
-    <div class="pc-row">
-      ${intros.map((i) => bub(i)).join(" ")}
-      ${blank("70px")}
-      ${sideLine("Place", "55px")}
-    </div>
-    <div class="pc-divider"></div>
-    <div class="pc-row">
-      <span class="pc-text">I just wanted to say that your</span>
-    </div>
-    <div class="pc-row">
-      ${qualities.map((q) => bub(q)).join(" ")}
-      ${bub("____")}
-    </div>
-    <div class="pc-divider"></div>
-    <div class="pc-row">
-      ${adjectives.map((a) => bub(a)).join(" ")}
-    </div>
-    <div class="pc-divider"></div>
-    <div class="pc-row">
-      <span class="pc-text">Hope to hear from you</span>
-      ${whens.map((w) => bub(w)).join(" ")}
-    </div>
-    <div class="pc-row">
-      ${contacts.map((c) => bub(c)).join(" ")}
-      ${blank("90px")}
-    </div>
-  `;
-
-  return el;
-}
+// ===== Initial setup =====
+applyBodyFont(fontBodySelect.value);
+imageState.size = parseFloat(imageSizeSlider.value) * 100;
+updateImageSizeLabel();
+applySpacingScale(parseFloat(spacingSlider.value));
+applyFontScale(parseFloat(fontSizeSlider.value));

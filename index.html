@@ -7,12 +7,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Homemade+Apple&family=Patrick+Hand&family=Indie+Flower&family=Shadows+Into+Light&family=Gloria+Hallelujah&family=Architects+Daughter&family=Satisfy&family=Dancing+Script:wght@400;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Homemade+Apple&family=Patrick+Hand&family=Indie+Flower&family=Shadows+Into+Light&family=Gloria+Hallelujah&family=Architects+Daughter&family=Satisfy&family=Dancing+Script:wght@400;600;700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
   </head>
-  <body>
+  <body class="borderless">
     <header>
       <h1>Acquaintance Cards</h1>
       <p class="subtitle">
@@ -22,9 +22,12 @@
     </header>
 
     <main>
-      <!-- ====== THE CARD ====== -->
-      <div class="card-wrapper">
-        <div class="card" id="card">
+      <div class="workspace-layout">
+        <section class="card-column">
+          <h2 class="panel-title">Card Preview</h2>
+          <!-- ====== THE CARD ====== -->
+          <div class="card-wrapper">
+            <div class="card" id="card">
           <!-- Row 1: Greeting + Time/Place -->
           <div class="card-row greeting-row">
             <div class="bubble-group">
@@ -211,139 +214,215 @@
               maxlength="40"
             />
           </div>
-        </div>
-      </div>
 
-      <!-- ====== STYLE SWITCHER ====== -->
-      <div class="style-switcher">
-        <button class="style-btn active" data-style="modern">Modern</button>
-        <button class="style-btn" data-style="vintage">Vintage</button>
-        <button class="style-btn" data-style="borderless">Borderless</button>
-      </div>
-
-      <!-- ====== CUSTOMIZER ====== -->
-      <div class="customizer" id="customizer">
-        <button class="customizer-toggle" id="customizer-toggle">
-          Customize Style
-        </button>
-        <div class="customizer-panel" id="customizer-panel">
-          <div class="customizer-group">
-            <label class="customizer-label">Card Font</label>
-            <select id="opt-font-body">
-              <option value="'DM Sans', sans-serif">DM Sans (default)</option>
-              <option value="'Architects Daughter', cursive">
-                Architects Daughter
-              </option>
-              <option value="'Patrick Hand', cursive">Patrick Hand</option>
-              <option value="'Indie Flower', cursive">Indie Flower</option>
-              <option value="'Gloria Hallelujah', cursive">
-                Gloria Hallelujah
-              </option>
-              <option value="Georgia, serif">Georgia</option>
-              <option value="system-ui, sans-serif">System UI</option>
-            </select>
-          </div>
-
-          <div class="customizer-group">
-            <label class="customizer-label">Handwriting Font</label>
-            <select id="opt-font-hand">
-              <option value="'Caveat', cursive">Caveat (default)</option>
-              <option value="'Homemade Apple', cursive">Homemade Apple</option>
-              <option value="'Shadows Into Light', cursive">
-                Shadows Into Light
-              </option>
-              <option value="'Dancing Script', cursive">Dancing Script</option>
-              <option value="'Satisfy', cursive">Satisfy</option>
-              <option value="'Patrick Hand', cursive">Patrick Hand</option>
-            </select>
-          </div>
-
-          <div class="customizer-group">
-            <label class="customizer-label">Ink Color</label>
-            <div class="ink-swatches" id="ink-swatches">
-              <button
-                class="ink-swatch active"
-                data-color="#2c2420"
-                style="background: #2c2420"
-                title="Dark Brown"
-              ></button>
-              <button
-                class="ink-swatch"
-                data-color="#1a1a2e"
-                style="background: #1a1a2e"
-                title="Midnight"
-              ></button>
-              <button
-                class="ink-swatch"
-                data-color="#0d3b66"
-                style="background: #0d3b66"
-                title="Navy"
-              ></button>
-              <button
-                class="ink-swatch"
-                data-color="#6b2737"
-                style="background: #6b2737"
-                title="Burgundy"
-              ></button>
-              <button
-                class="ink-swatch"
-                data-color="#2d6a4f"
-                style="background: #2d6a4f"
-                title="Forest"
-              ></button>
-              <button
-                class="ink-swatch"
-                data-color="#7b2d8b"
-                style="background: #7b2d8b"
-                title="Plum"
-              ></button>
-              <button
-                class="ink-swatch"
-                data-color="#c96b6b"
-                style="background: #c96b6b"
-                title="Rose"
-              ></button>
-              <input
-                type="color"
-                id="ink-custom"
-                value="#2c2420"
-                title="Custom color"
-              />
+              <div class="card-image-layer" id="card-image-layer">
+                <img id="card-image" alt="Custom card artwork" />
+              </div>
             </div>
           </div>
+        </section>
 
-          <div class="customizer-group">
-            <label class="customizer-label">Card Spacing</label>
-            <input
-              type="range"
-              id="opt-spacing"
-              min="0.5"
-              max="1.5"
-              step="0.1"
-              value="1"
-            />
-            <span class="range-label" id="spacing-label">Normal</span>
+        <aside class="controls-column">
+          <div class="controls-shell">
+            <h2 class="panel-title">Customization</h2>
+
+            <!-- ====== STYLE SWITCHER ====== -->
+            <div class="style-switcher">
+              <button class="style-btn" data-style="modern">Modern</button>
+              <button class="style-btn" data-style="vintage">Vintage</button>
+              <button class="style-btn active" data-style="borderless">
+                Borderless
+              </button>
+            </div>
+
+            <!-- ====== CUSTOMIZER ====== -->
+            <div class="customizer" id="customizer">
+              <div class="customizer-panel" id="customizer-panel">
+                <div class="customizer-group">
+                  <label class="customizer-label">Card Font</label>
+                  <select id="opt-font-body">
+                    <option value="'DM Sans', sans-serif">DM Sans (default)</option>
+                    <option value="'Flatface Haleys Sans'">Flatface Haleys Sans</option>
+                    <option value="'Gautreaux Medium'">Gautreaux Medium</option>
+                    <option value="'Flatface Haleys Script'">
+                      Flatface Haleys Script
+                    </option>
+                    <option value="'Architects Daughter', cursive">
+                      Architects Daughter
+                    </option>
+                    <option value="'Patrick Hand', cursive">Patrick Hand</option>
+                    <option value="'Indie Flower', cursive">Indie Flower</option>
+                    <option value="'Gloria Hallelujah', cursive">
+                      Gloria Hallelujah
+                    </option>
+                    <option value="Georgia, serif">Georgia</option>
+                    <option value="system-ui, sans-serif">System UI</option>
+                  </select>
+                </div>
+
+                <div class="customizer-group">
+                  <label class="customizer-label">Upload Font</label>
+                  <input
+                    type="file"
+                    id="opt-font-upload"
+                    accept=".otf,.ttf,.woff,.woff2,font/otf,font/ttf,font/woff,font/woff2"
+                  />
+                </div>
+
+                <div class="customizer-group">
+                  <label class="customizer-label">Card Image</label>
+                  <input
+                    type="file"
+                    id="opt-image-upload"
+                    accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                  />
+                  <button class="btn-inline" id="opt-image-clear" type="button">
+                    Clear
+                  </button>
+                </div>
+
+                <div class="customizer-group">
+                  <label class="customizer-label">Image Size</label>
+                  <input
+                    type="range"
+                    id="opt-image-size"
+                    min="0.12"
+                    max="0.8"
+                    step="0.02"
+                    value="0.28"
+                  />
+                  <span class="range-label" id="image-size-label">28%</span>
+                </div>
+
+                <p class="customizer-note">
+                  Drag the image directly on the card to place it.
+                </p>
+
+                <div class="customizer-group">
+                  <label class="customizer-label">Ink Color</label>
+                  <div class="ink-swatches" id="ink-swatches">
+                    <button
+                      class="ink-swatch active"
+                      data-color="#d85c52"
+                      style="background: #d85c52"
+                      title="Coral Pop"
+                    ></button>
+                    <button
+                      class="ink-swatch"
+                      data-color="#d98032"
+                      style="background: #d98032"
+                      title="Apricot"
+                    ></button>
+                    <button
+                      class="ink-swatch"
+                      data-color="#2c9e94"
+                      style="background: #2c9e94"
+                      title="Aqua"
+                    ></button>
+                    <button
+                      class="ink-swatch"
+                      data-color="#3f78d7"
+                      style="background: #3f78d7"
+                      title="Blueberry"
+                    ></button>
+                    <button
+                      class="ink-swatch"
+                      data-color="#8659c7"
+                      style="background: #8659c7"
+                      title="Lavender"
+                    ></button>
+                    <button
+                      class="ink-swatch"
+                      data-color="#c55282"
+                      style="background: #c55282"
+                      title="Raspberry"
+                    ></button>
+                    <button
+                      class="ink-swatch"
+                      data-color="#5b9b43"
+                      style="background: #5b9b43"
+                      title="Meadow"
+                    ></button>
+                    <button
+                      class="ink-swatch"
+                      data-color="#e45f86"
+                      style="background: #e45f86"
+                      title="Rose Bloom"
+                    ></button>
+                    <button
+                      class="ink-swatch"
+                      data-color="#c73f63"
+                      style="background: #c73f63"
+                      title="Cherry Kiss"
+                    ></button>
+                    <button
+                      class="ink-swatch"
+                      data-color="#a92f59"
+                      style="background: #a92f59"
+                      title="Cranberry"
+                    ></button>
+                    <button
+                      class="ink-swatch"
+                      data-color="#d98ab1"
+                      style="background: #d98ab1"
+                      title="Blush"
+                    ></button>
+                    <button
+                      class="ink-swatch"
+                      data-color="#b75b99"
+                      style="background: #b75b99"
+                      title="Peony"
+                    ></button>
+                    <button
+                      class="ink-swatch"
+                      data-color="#7e325f"
+                      style="background: #7e325f"
+                      title="Velvet Plum"
+                    ></button>
+                    <input
+                      type="color"
+                      id="ink-custom"
+                      value="#d85c52"
+                      title="Custom color"
+                    />
+                  </div>
+                </div>
+
+                <div class="customizer-group">
+                  <label class="customizer-label">Card Spacing</label>
+                  <input
+                    type="range"
+                    id="opt-spacing"
+                    min="0.55"
+                    max="0.85"
+                    step="0.005"
+                    value="0.7"
+                  />
+                  <span class="range-label" id="spacing-label">70%</span>
+                </div>
+
+                <div class="customizer-group">
+                  <label class="customizer-label">Font Size</label>
+                  <input
+                    type="range"
+                    id="opt-font-size"
+                    min="0.7"
+                    max="1"
+                    step="0.005"
+                    value="0.85"
+                  />
+                  <span class="range-label" id="font-size-label">85%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- ====== ACTIONS ====== -->
+            <div class="actions">
+              <button class="btn btn-secondary" id="btn-reset">Start Over</button>
+              <button class="btn btn-primary" id="btn-print">Print Cards</button>
+            </div>
           </div>
-
-          <div class="customizer-group">
-            <label class="customizer-label">Font Size</label>
-            <input
-              type="range"
-              id="opt-font-size"
-              min="0.8"
-              max="1.3"
-              step="0.05"
-              value="1"
-            />
-            <span class="range-label" id="font-size-label">Normal</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- ====== ACTIONS ====== -->
-      <div class="actions">
-        <button class="btn btn-secondary" id="btn-reset">Start Over</button>
-        <button class="btn btn-primary" id="btn-print">Print Cards</button>
+        </aside>
       </div>
 
       <!-- ====== PRINT PREVIEW (4-up) ====== -->
